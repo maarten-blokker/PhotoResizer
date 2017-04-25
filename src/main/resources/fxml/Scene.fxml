@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="350.0" stylesheets="@../styles/Styles.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane hgap="3.0" vgap="5.0" VBox.vgrow="ALWAYS">
+        <columnConstraints>
+          <ColumnConstraints hgrow="NEVER" />
+          <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="300.0" />
+            <ColumnConstraints hgrow="NEVER" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints vgrow="NEVER" />
+          <RowConstraints vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
+        </rowConstraints>
+         <children>
+            <Label text="Bron map:" />
+            <Label text="Doel map:" GridPane.rowIndex="1" />
+            <Button fx:id="btnChooseSourceFolder" mnemonicParsing="false" styleClass="icon-folder-small" text="Kiezen" GridPane.columnIndex="2" />
+            <Button fx:id="btnChooseTargetFolder" mnemonicParsing="false" styleClass="icon-folder-small" text="Kiezen" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="Orientatie:" GridPane.rowIndex="2" />
+            <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <RadioButton fx:id="radioOrientationLandscape" mnemonicParsing="false" selected="true" text="Landscape">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleOrientation" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="radioOrientationPortrait" mnemonicParsing="false" text="Portrait" toggleGroup="$toggleOrientation" />
+               </children>
+               <padding>
+                  <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+               </padding>
+            </HBox>
+            <Label text="Afmetingen:" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+            <VBox fx:id="containerMeasurements" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="Opvulling:" GridPane.rowIndex="3" />
+            <ColorPicker fx:id="cboxColor" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="txtSourceFolder" editable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="txtTargetFolder" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </GridPane>
+      <HBox alignment="BOTTOM_RIGHT" spacing="5.0">
+         <children>
+            <Button fx:id="btnCancel" cancelButton="true" minWidth="55.0" mnemonicParsing="false" text="Cancel" />
+            <Button fx:id="btnStart" defaultButton="true" minWidth="55.0" mnemonicParsing="false" text="Start" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>
