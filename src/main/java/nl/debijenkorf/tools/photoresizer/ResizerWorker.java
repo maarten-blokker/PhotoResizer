@@ -13,7 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,6 +42,7 @@ public class ResizerWorker {
     private static final String IMAGE_FILE_PATTERN = "glob:**/*.{jpg,jpeg,png,bmp,gif,tif,tiff}";
 
     private final ImageResizerService resizer = new ImgScalrResizer(new SmartImageAligner());
+    private final List<Path> processedFiles = new CopyOnWriteArrayList<>();
     private final AtomicBoolean running = new AtomicBoolean();
     private final ListeningExecutorService service;
     private final Preset preset;
@@ -105,7 +108,11 @@ public class ResizerWorker {
 
     public void stop() {
         finish(true);
-        service.shutdownNow();
+        service.shutdown();
+    }
+
+    public List<Path> getProcessedFiles() {
+        return Collections.unmodifiableList(processedFiles);
     }
 
     private ListenableFuture<List<Path>> findFiles() {
@@ -142,6 +149,7 @@ public class ResizerWorker {
             try (InputStream in = Files.newInputStream(srcFile);
                     OutputStream out = Files.newOutputStream(dstFile, StandardOpenOption.CREATE)) {
                 resizer.process(preset, awtColor, true, in, out);
+                processedFiles.add(dstFile);
                 LOG.info("Processed file: {}", dstFile);
             } catch (IOException ex) {
                 deleteQuitly(dstFile);

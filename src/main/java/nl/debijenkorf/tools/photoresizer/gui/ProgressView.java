@@ -1,7 +1,11 @@
 package nl.debijenkorf.tools.photoresizer.gui;
 
+import java.awt.Desktop;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -11,11 +15,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 import nl.debijenkorf.tools.photoresizer.ResizerWorker;
@@ -26,7 +32,7 @@ import nl.debijenkorf.tools.photoresizer.ResizerWorker;
  */
 public class ProgressView extends AbstractView implements ResizerWorker.Listener {
 
-    private final DoubleProperty progressProperty = new SimpleDoubleProperty();
+    private final DoubleProperty progressProperty = new SimpleDoubleProperty(ProgressBar.INDETERMINATE_PROGRESS);
 
     @FXML
     private ProgressBar progressBar;
@@ -46,6 +52,7 @@ public class ProgressView extends AbstractView implements ResizerWorker.Listener
     private void initComponents() {
         progressBar.progressProperty().bind(progressProperty);
         lblProgress.textProperty().bind(progressProperty.multiply(100).asString("%.0f"));
+        lblProgress.visibleProperty().bind(progressProperty.greaterThan(0D));
     }
 
     private void showExceptionDialog(String title, String description, Throwable exception) {
@@ -71,6 +78,25 @@ public class ProgressView extends AbstractView implements ResizerWorker.Listener
         expContent.add(textArea, 0, 1);
 
         alert.getDialogPane().setExpandableContent(expContent);
+        alert.showAndWait();
+    }
+
+    private void showFinishedDialog(List<Path> processedFiles) {
+        Label label = new Label("Er zijn " + processedFiles.size() + " foto's omgezet.");
+        Hyperlink link = new Hyperlink("Klik hier om naar de doel map te gaan.");
+        link.setOnAction((evt) -> {
+            try {
+                Desktop.getDesktop().open(processedFiles.get(0).toFile().getParentFile());
+            } catch (IOException ex) {
+                showExceptionDialog(
+                        "Kon doel map niet openen",
+                        "Het lukte niet om de map te openen: \n" + ex.getLocalizedMessage(), ex);
+            }
+        });
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("Foto's omzetten succesvol");
+        alert.getDialogPane().setContent(new VBox(5, label, link));
         alert.showAndWait();
     }
 
@@ -108,8 +134,11 @@ public class ProgressView extends AbstractView implements ResizerWorker.Listener
                         + "Er ging iets mis tijdens het omzetten van de foto's:\n"
                         + worker.getException().getLocalizedMessage(),
                         worker.getException());
+            } else {
+                showFinishedDialog(worker.getProcessedFiles());
             }
             dialog.close();
         });
     }
+
 }
